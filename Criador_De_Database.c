@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-
+//Esse codigo permite criar arquivos no formato convencionado para o trabalho, a fim de realizar testes
 typedef struct produto {
   int quantidade;
   float preco;
@@ -39,7 +39,7 @@ int main(){
     int mode;
     FILE *db = fopen("database.bin", "w+b");
     while(1){
-        scanf("%d", &mode);
+        scanf("%d", &mode);  //Para utilizar, basta escolher algo para inserir (1 - int/ 2 -float/ 3 - produto/ 4 - finaliza a execucao
         switch(mode){
             case 1:
                 putint(db);
