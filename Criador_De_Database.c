@@ -11,7 +11,6 @@ void putint(FILE *db){
     int n;
     scanf("%d", &n);
     fwrite(&n, sizeof(int), 1, db);
-    printf("oi");
 }
 
 
@@ -19,22 +18,16 @@ void putfloat(FILE *db){
     float n;
     scanf("%f", &n);
     fwrite(&n, sizeof(float), 1, db);
-    printf("oi");
 }
 void putstruct(FILE *db){
     produto a;
     scanf("%d %f %s" , &a.quantidade, &a.preco, a.nome);
     fwrite(&a, sizeof(produto), 1, db);
-    printf("oi");
 }
 void end(FILE *db){
     fclose(db);
-    printf("oi");
     exit(0);
 }
-
-
-
 int main(){
     int mode;
     FILE *db = fopen("database.bin", "w+b");
