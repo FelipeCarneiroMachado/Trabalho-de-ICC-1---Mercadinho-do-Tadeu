@@ -1,4 +1,4 @@
-#include <stbool.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +20,7 @@ typedef struct produto {
 // Implementacao das funcoes para pegar strings
 char *Entrada_palavra() {
   int n_letras = 0;
-  char c, string = (char)malloc(10 * sizeof(char));
+  char c, *string = (char)malloc(10 * sizeof(char));
   while ((c = getchar()) != '_') {
     string[n_letras] = c;
     n_letras++;
@@ -31,7 +31,7 @@ char *Entrada_palavra() {
 }
 char *Entrada_linha() {
   int n_letras = 0;
-  char c, string = (char)malloc(10 * sizeof(char));
+  char c, *string = (char)malloc(10 * sizeof(char));
   while ((c = getchar()) != '\n') {
     string[n_letras] = c;
     n_letras++;
@@ -48,7 +48,7 @@ void Imprime_divisoria(){
 void Insere_produto(produto *estoque,int *nprodutos){
   *nprodutos++;
   estoque = (produto*)realloc(estoque, *nprodutos * sizeof(produto));
-  estoque[*nprodutos - 1].nome = Entrada_palavra();
+  *estoque[*(nprodutos) - 1].nome = Entrada_palavra();
   scanf("%d %f", &estoque[*nprodutos - 1].quantidade, &estoque[*nprodutos - 1].preco);
 }
 
@@ -61,7 +61,7 @@ void Aumenta_estoque(produto *estoque){
 void Modifica_preco(produto *estoque){
   int codigo, preco;
   scanf("%d %f", &codigo, &preco);  
-  estoque[].preco = preco;
+  estoque[codigo].preco = preco;
 }
 
 void Venda(float* saldo, produto *estoque){
@@ -95,11 +95,11 @@ void Consulta_saldo(float saldo){
 /* Funcao para abrir o arquivo e escrever nele se ele ja existir, senao, o
  * programa pergunta a quantidade de produtos e o saldo */
 FILE *Ler_arquivo(int *n_produtos, float *saldo) {
-  FILE *database = fopen("database", "r+b");
+  FILE *database = fopen("database.bin", "r+b");
   bool arquivo_existe = true;
   if (database == NULL) {
     arquivo_existe = false;
-    *database = fopen("database", "w+b");
+    database = fopen("database.bin", "w+b");
   }
   if (arquivo_existe) {
     fread(n_produtos, sizeof(int), 1, database);
@@ -111,6 +111,14 @@ FILE *Ler_arquivo(int *n_produtos, float *saldo) {
   }
   return database;
 }
+void Finalizar_dia(int nprodutos, float saldo, produto *estoque, FILE  *database){
+  database = freopen("database.bin", "w+b", database);
+  fwrite(&nprodutos, sizeof(int), 1, database);
+  fwrite(&saldo, sizeof(float), 1, database);
+  fwrite(estoque, sizeof(produto), nprodutos, database);
+  fclose(database);
+  exit(0);
+}
 
 // Funcao que vai ler a struct produto
 produto *Ler_estoque(int nprodutos, FILE *stream) {
@@ -121,8 +129,8 @@ produto *Ler_estoque(int nprodutos, FILE *stream) {
 // Funcao que identifica cada comando e retorna um numero correspondente
 int Identifica_funcionalidade() {
   char c1, c2;
-  scanf("%c%c ", &c1, &c2);
-  switch c1{
+  scanf("%c%c", &c1, &c2);
+  switch (c1){
     case 'I':return 1;
     case 'A':return 2;
     case 'M':return 3;
@@ -137,23 +145,23 @@ int main(void) {
   float saldo;
   FILE *database = Ler_arquivo(&n_produtos, &saldo);
   produto *estoque = Ler_estoque(n_produtos, database);
-
-  int funcionalidade = Identifica_funcionalidade();
-  switch (funcionalidade) {
-  case 1:
-    Insere_produto(estoque, n_produtos);
-  case 2:
-    Aumenta_estoque(estoque);
-  case 3:
-    Modifica_preco(estoque);
-  case 4:
-    Venda(&saldo, estoque);
-  case 5:
-    Consulta_estoque();
-  case 6:
-    Consulta_saldo();
-  case 7:
-    Finalizar_dia();
+  while(true){
+    int funcionalidade = Identifica_funcionalidade();
+    switch (funcionalidade) {
+      case 1:
+        Insere_produto(estoque, n_produtos);
+      case 2:
+        Aumenta_estoque(estoque);
+      case 3:
+        Modifica_preco(estoque);
+      case 4:
+        Venda(&saldo, estoque);
+      case 5:
+        Consulta_estoque(n_produtos, estoque);
+      case 6:
+        Consulta_saldo(saldo);
+      case 7:
+        Finalizar_dia(n_produtos, saldo, estoque, database);
+    }
   }
-  return 0;
 }
