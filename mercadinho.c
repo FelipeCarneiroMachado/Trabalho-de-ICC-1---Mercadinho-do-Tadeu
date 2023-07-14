@@ -4,13 +4,19 @@
 #include <string.h>
 
 /*
-Trabalho final do semestre
-Disciplina SCC0221 - Introducao a ciencia da computacao
+Trabalho de final do semestre
+Disciplina [SCC0221] - Introducao a ciencia da computacao
 Professor Rudinei Goularte - ICMC - USP
-Realizado em grupo pelos alunos
-Felipe Carneiro Machado - 14569373
-Eduarda Tuboy Nardin - 13732495
-Rafael Mansur - Rafael Brazolin Alves Mansur
+
+Programa que realiza funcoes de um sistema de manutencao de estoque de um
+mercado, podendo: inserir novos produtos, aumentar o estoque, modificar o preco
+de um produto, realizar vendas, consultar o estoque dos produtos, cnsultar o
+saldo do caixa e armanezar as informacoes em um arquivo para proximas consultas.
+
+Realizado em grupo pelos alunos:
+Felipe Carneiro Machado - nº 14569373
+Eduarda Tuboy Nardin - nº 13732495
+Rafael Brazolin Alves Mansur - nº 14604020
 */
 
 // Struct de cada produto do mercado
@@ -30,14 +36,17 @@ void Venda(double *saldo, produto *estoque);
 void Consulta_estoque(int nprodutos, produto *estoque);
 void Consulta_saldo(double saldo);
 FILE *Ler_arquivo(int *nprodutos, double *saldo);
-void Finalizar_dia(int nprodutos, double saldo, produto *estoque, FILE *database);
+void Finalizar_dia(int nprodutos, double saldo, produto *estoque,
+                   FILE *database);
 produto *Ler_estoque(int nprodutos, FILE *stream);
 int Identifica_funcionalidade();
-// Funcao para ler caracteres ate o espaco e retornando em uma string
-char *Entrada_palavra() { // debugada
+
+/* Funcao para ler caracteres ate o espaco ou quebra de linha e retornando em
+ * uma string */
+char *Entrada_palavra() {
   int n_letras = 0;
   char c, *string = (char *)malloc(30 * sizeof(char));
-  while (((c = getchar()) != ' ') && (c != '\n')) {
+  while (((c = getchar()) != ' ') && (c != '\n') && c != '\r') {
     string[n_letras] = c;
     n_letras++;
     if ((n_letras % 30) == 0)
@@ -47,7 +56,7 @@ char *Entrada_palavra() { // debugada
   return string;
 }
 
-void Imprime_divisoria() { // funcionamento pleno
+void Imprime_divisoria() {
   for (int i = 0; i < 50; i++)
     printf("-");
   printf("\n");
@@ -67,7 +76,7 @@ produto *Insere_produto(produto *estoque, int *nprodutos) {
   return estoque;
 }
 
-void Aumenta_estoque(produto *estoque) { // funcionamento pleno
+void Aumenta_estoque(produto *estoque) {
   int codigo, quantidade_nova;
   char *fvckscanf = Entrada_palavra();
   codigo = atoi(fvckscanf);
@@ -76,7 +85,7 @@ void Aumenta_estoque(produto *estoque) { // funcionamento pleno
   estoque[codigo].quantidade += quantidade_nova;
 }
 
-void Modifica_preco(produto *estoque) { // funciona plenamente
+void Modifica_preco(produto *estoque) {
   int codigo, preco;
   char *fvckscanf = Entrada_palavra();
   codigo = atoi(fvckscanf);
@@ -85,7 +94,7 @@ void Modifica_preco(produto *estoque) { // funciona plenamente
   estoque[codigo].preco = preco;
 }
 
-void Venda(double *saldo, produto *estoque) { // funciona plenamente
+void Venda(double *saldo, produto *estoque) {
   int codigo;
   double acum_saldo = 0.0;
   scanf("%d", &codigo);
@@ -93,31 +102,30 @@ void Venda(double *saldo, produto *estoque) { // funciona plenamente
   while (codigo != (-1)) {
     estoque[codigo].quantidade--;
     acum_saldo += estoque[codigo].preco;
-    printf("%s %lf\n", estoque[codigo].nome, estoque[codigo].preco);
+    printf("%s %.02lf\n", estoque[codigo].nome, estoque[codigo].preco);
     scanf("%d", &codigo);
     getchar();
   }
   *saldo += acum_saldo;
-  printf("Total: %f\n", acum_saldo);
+  printf("Total: %.02f\n", acum_saldo);
   Imprime_divisoria();
 }
 
-void Consulta_estoque(int nprodutos, produto *estoque) { // funciona plenamente
+void Consulta_estoque(int nprodutos, produto *estoque) {
   for (int i = 0; i < nprodutos; i++) {
     printf("%d %s %d\n", i, estoque[i].nome, estoque[i].quantidade);
   }
   Imprime_divisoria();
 }
 
-void Consulta_saldo(double saldo) { // funciona plenamente
-  printf("Saldo: %lf\n", saldo);
+void Consulta_saldo(double saldo) {
+  printf("Saldo: %.02lf\n", saldo);
   Imprime_divisoria();
 }
 
 /* Funcao para abrir o arquivo e escrever nele se ele ja existir, senao, o
  * programa pergunta a quantidade de produtos e o saldo */
 FILE *Ler_arquivo(int *nprodutos, double *saldo) {
-  // aparentemente livre  de bugs
   FILE *database = fopen("database.bin", "r+b");
   bool arquivo_existe = true;
   if (database == NULL) {
@@ -139,7 +147,6 @@ FILE *Ler_arquivo(int *nprodutos, double *saldo) {
 }
 void Finalizar_dia(int nprodutos, double saldo, produto *estoque,
                    FILE *database) {
-  // aparentemente livre de bugs
   database = freopen("database.bin", "w+b", database);
   fwrite(&nprodutos, sizeof(int), 1, database);
   fwrite(&saldo, sizeof(double), 1, database);
@@ -150,7 +157,6 @@ void Finalizar_dia(int nprodutos, double saldo, produto *estoque,
 
 // Funcao que vai ler a struct produto
 produto *Ler_estoque(int nprodutos, FILE *stream) {
-  // sem bugs ate o momento
   produto *estoque = (produto *)malloc((nprodutos + 1) * sizeof(produto));
   fread(estoque, sizeof(produto), nprodutos, stream);
   return estoque;
@@ -186,25 +192,26 @@ int main(void) {
     int funcionalidade = Identifica_funcionalidade();
     switch (funcionalidade) {
     case 1:
-      estoque = Insere_produto(estoque, &n_produtos); // IP <nome> <quantidade> <preco>
+      estoque = Insere_produto(estoque,
+                               &n_produtos); // IP <nome> <quantidade> <preco>
       break;
     case 2:
-      Aumenta_estoque(estoque); // AE <codigo> <quantidade>
+      Aumenta_estoque(estoque);
       break;
     case 3:
-      Modifica_preco(estoque); // MP <codigo> <preco>
+      Modifica_preco(estoque);
       break;
     case 4:
-      Venda(&saldo, estoque); // VE <codigo> <codigo> <codigo> ... -1
+      Venda(&saldo, estoque);
       break;
     case 5:
-      Consulta_estoque(n_produtos, estoque); // CE
+      Consulta_estoque(n_produtos, estoque);
       break;
     case 6:
-      Consulta_saldo(saldo); // CS
+      Consulta_saldo(saldo);
       break;
     case 7:
-      Finalizar_dia(n_produtos, saldo, estoque, database); // FD
+      Finalizar_dia(n_produtos, saldo, estoque, database);
       break;
     default:
       printf("Selecione um comando válido");
