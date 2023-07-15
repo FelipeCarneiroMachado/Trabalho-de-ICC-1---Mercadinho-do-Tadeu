@@ -98,7 +98,6 @@ void Modifica_preco(produto *estoque) {
 void Venda(double *saldo, produto *estoque) {
   int codigo = 0;
   double acum_saldo = 0.0;
-  getchar(); // Para consumir o espaco
   while (codigo != (-1)) {
     scanf("%d", &codigo);
     getchar();
