@@ -69,9 +69,11 @@ produto *Insere_produto(produto *estoque, int *nprodutos) {
   // fvckscanf eh uma string temporária para pegar a quantidade e o preco
   char *fvckscanf = Entrada_palavra();
   int quantidade = atoi(fvckscanf);
+  free(fvckscanf);
   estoque[*(nprodutos)-1].quantidade = quantidade;
   fvckscanf = Entrada_palavra();
   double preco = atof(fvckscanf);
+  free(fvckscanf);
   estoque[*(nprodutos)-1].preco = preco;
   return estoque;
 }
@@ -80,8 +82,10 @@ void Aumenta_estoque(produto *estoque) {
   int codigo, quantidade_nova;
   char *fvckscanf = Entrada_palavra();
   codigo = atoi(fvckscanf);
+  free(fvckscanf);
   fvckscanf = Entrada_palavra();
   quantidade_nova = atoi(fvckscanf);
+  free(fvckscanf);
   estoque[codigo].quantidade += quantidade_nova;
 }
 
@@ -90,8 +94,10 @@ void Modifica_preco(produto *estoque) {
   double preco;
   char *fvckscanf = Entrada_palavra();
   codigo = atoi(fvckscanf);
+  free(fvckscanf);
   fvckscanf = Entrada_palavra();
   preco = atof(fvckscanf);
+  free(fvckscanf);
   estoque[codigo].preco = preco;
 }
 
@@ -141,8 +147,10 @@ FILE *Ler_arquivo(int *nprodutos, double *saldo) {
   } else {
     char *fvckscanf = Entrada_palavra();
     *nprodutos = atoi(fvckscanf);
+    free(fvckscanf);
     fvckscanf = Entrada_palavra();
     *saldo = atof(fvckscanf);
+    free(fvckscanf);
     *nprodutos = 0; // cara n faz sentido ler o n de produtos pq ele aumenta
                     // sempre q insere produto ent fiz essa gambiarra
   }
