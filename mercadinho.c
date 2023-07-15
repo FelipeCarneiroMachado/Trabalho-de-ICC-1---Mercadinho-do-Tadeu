@@ -86,7 +86,8 @@ void Aumenta_estoque(produto *estoque) {
 }
 
 void Modifica_preco(produto *estoque) {
-  int codigo, preco;
+  int codigo;
+  double preco;
   char *fvckscanf = Entrada_palavra();
   codigo = atoi(fvckscanf);
   fvckscanf = Entrada_palavra();
@@ -95,16 +96,19 @@ void Modifica_preco(produto *estoque) {
 }
 
 void Venda(double *saldo, produto *estoque) {
-  int codigo;
+  int codigo = 0;
   double acum_saldo = 0.0;
-  scanf("%d", &codigo);
   getchar(); // Para consumir o espaco
   while (codigo != (-1)) {
+    scanf("%d", &codigo);
+    getchar();
+    // printf("codigo:%d", codigo);
+    if (estoque[codigo].quantidade == 0 || codigo == -1) {
+      continue;
+    }
     estoque[codigo].quantidade--;
     acum_saldo += estoque[codigo].preco;
     printf("%s %.02lf\n", estoque[codigo].nome, estoque[codigo].preco);
-    scanf("%d", &codigo);
-    getchar();
   }
   *saldo += acum_saldo;
   printf("Total: %.02f\n", acum_saldo);
@@ -214,7 +218,8 @@ int main(void) {
       Finalizar_dia(n_produtos, saldo, estoque, database);
       break;
     default:
-      printf("Selecione um comando válido");
+      printf("ler dnv\n");
+      // funcionalidade = Identifica_funcionalidade();
     }
   }
 }
